@@ -1,0 +1,245 @@
+<html>
+	<head>
+			<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+			<script>
+function getAPIRoot() {
+	return '';
+}
+
+function API(token) {
+    this.token = token;
+    this.headers = {};
+    this.headers.Authorization = ' Bearer ' + token;
+}
+
+API.prototype.createSlug = function(slug) {
+  	let reqURL = getAPIRoot() + '/slug/create/';
+	return postAPI(reqURL, slug, this.headers);
+};
+
+API.prototype.fetchSlugFile = function(slugID, url, dir) {
+    let reqURL = getAPIRoot() + '/fs/slug/' + slugID + '/fetch/file/';
+	return postAPI(reqURL, {url, dir}, this.headers, 300000);
+};
+
+API.prototype.createSlugDatabase = function(slugID) {
+    let reqURL = getAPIRoot() + '/db/create/';
+	return postAPI(reqURL, {slugID}, this.headers);
+};
+
+API.prototype.getSlugDatabase = function(slugID) {
+
+    let reqURL = getAPIRoot() + '/db/slug/' + slugID + '/';
+	return getAPI(reqURL, this.headers);
+};
+
+API.prototype.runSlugSQL = function(slugID, url) {
+    let reqURL = getAPIRoot() + '/db/run/';
+	return postAPI(reqURL, {url, slugID}, this.headers);
+};
+
+API.prototype.composeSlugTextFile = function(slugID, url, dir, model) {
+    let reqURL = getAPIRoot() + '/fs/slug/' + slugID + '/compose/file/';
+	return postAPI(reqURL, {url, dir, model}, this.headers, 200000);
+};
+
+API.prototype.startupSlug = function(slugID) {
+    let reqURL = getAPIRoot() + '/slug/startup/';
+	return postAPI(reqURL, {slugID}, this.headers);
+};
+
+
+API.prototype.shutdownSlug = function(slugID) {
+    let reqURL = getAPIRoot() + '/slug/startup/';
+	return postAPI(reqURL, {slugID}, this.headers);
+};
+
+
+var API_TIMEOUT = 30000;
+
+function postAPI (url, data, exheaders, timeout) {
+	return _postJSON(url, data, exheaders, timeout).then(resp => {
+		return resp.data;
+	}).catch(err => {
+		console.log('eror postJSON->url:%s %o', url, err);
+		let resp = err.response;
+		if (resp) {
+			let status = resp.status;
+			if (status === 422) {
+				if (resp.data.errors) {
+					let message = resp.data.errors[0].msg;
+					throw message; 
+				}
+			}
+		}
+		throw err;
+	});
+};
+
+function getAPI(url , exheaders, timeout){
+	return _getJSON(url, exheaders, timeout).then(resp => {
+		return resp.data;
+	}).catch(err => {
+		console.log('eror postJSON->url:%s %o', url, err);
+		let resp = err.response;
+		if (resp) {
+			let status = resp.status;
+			if (status === 422) {
+				if (resp.data.errors) {
+					let message = resp.data.errors[0].msg;
+					throw message; 
+				}
+			}
+		}
+		
+		throw err;
+	});
+}
+
+
+function _postJSON(url, data, exheaders, timeout) {
+
+	
+	let headers = {
+		'Accept': 'application/json',
+		'Content-Type': 'application/json',
+	};
+	let method = 'post';
+
+	if (exheaders) {
+		headers = Object.assign({}, headers, exheaders);
+	}
+		
+	return axios(
+		{
+			url,
+			method,
+			headers,
+			timeout,
+			data,
+		});
+
+}
+
+function _getJSON(url, exheaders, timeout) {
+
+
+	let headers = {
+		'Accept': 'application/json',
+		'Content-Type': 'application/json',
+	};
+	let method = 'get';
+
+	if (exheaders) {
+		headers = Object.assign({}, headers, exheaders);
+	}
+		
+	return axios(
+		{
+			url,
+			method,
+			headers,
+			timeout,
+		});
+}
+
+function wp_generate_password(length = 12, special_chars = true, extra_special_chars = false ) {
+	let chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+	if (special_chars) {
+		chars += '!@#$%^&*()';
+	}
+	if (extra_special_chars) {
+		chars += '-_}~`+=,.;:|';
+	}
+	let result = [];
+	let min = 0;
+	let max = chars.length - 1;
+	for (let i = 0; i < length; i++) {
+		let idx = Math.floor(Math.random() * (max - min + 1)) + min;
+		result.push(chars.charAt(idx));
+	}
+	return result.join('');
+}
+
+var _messages = [];
+
+function sendMessage(msg) {
+	_messages.push(msg);
+	showMessages();
+}
+
+function showMessages() {
+
+	let eleMsg = document.getElementById('_message');
+	let msgs = _messages.map(msg => '<div>' + msg + '</div>');
+	eleMsg.innerHTML = msgs.join('');
+}
+
+var token = '<%= token %>';
+var image = '<%= image %>';
+var id = '<%= id %>';
+var name = '<%= name %>';
+var appZip = 'https://wordpress.org/wordpress-4.9.10.zip';
+let appConfig = 'https://raw.githubusercontent.com/jaynsw/installer/master/wordpress/latest/wp-config.php';
+let setupPage = '/';				
+					
+function installer() {
+	document.getElementById('intallButton').style.display = 'none';
+	var slug = {id, name, image};
+	sendMessage('create a server for ' + name);
+	let api = new API(token);
+	api.createSlug(slug).then(saveData => {
+		let slugID = id;
+		sendMessage('downloading software, this will take a little bit longer, please wait...');
+		return api.fetchSlugFile(slugID, appZip, '/').then(downloadData => {
+			sendMessage('create database...');
+			return api.createSlugDatabase(slugID).then(saveData => {
+				return api.getSlugDatabase(slugID).then(dbo => {
+					let DB_NAME = dbo.user;
+					let DB_USER = dbo.user;
+					let DB_PASSWORD = dbo.pwd;
+					let DB_HOST = dbo.host + ':' + dbo.port;
+					let DB_CHARSET ='utf8mb4';
+					let AUTH_KEY = wp_generate_password(64, true, true);
+					let SECURE_AUTH_KEY = wp_generate_password(64, true, true);
+					let LOGGED_IN_KEY = wp_generate_password(64, true, true);
+					let NONCE_KEY = wp_generate_password(64, true, true);
+					let AUTH_SALT = wp_generate_password(64, true, true);
+					let SECURE_AUTH_SALT = wp_generate_password(64, true, true);
+					let LOGGED_IN_SALT = wp_generate_password(64, true, true);
+					let NONCE_SALT = wp_generate_password(64, true, true);
+
+					let model = {DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_CHARSET, AUTH_KEY, SECURE_AUTH_KEY, LOGGED_IN_KEY, NONCE_KEY, AUTH_SALT, SECURE_AUTH_SALT, LOGGED_IN_SALT, NONCE_SALT};
+					sendMessage('config software...');
+					return api.composeSlugTextFile(slugID, appConfig, '/', model).then(genData => {
+						sendMessage('startup software...');
+						return api.startupSlug(slugID).then(startupData => {
+							sendMessage('congratulations. The installation is done. Please setup the website <a target="_blank" href="https://' + name + '/">https://' + name + '/' + '</a>' );
+							return startupData;
+						});	
+					});
+				});
+			});
+		});
+	}).catch(err => {
+		if (err.response && err.response.data && err.response.data.error) {
+			sendMessage(err.response.data.error);
+			return;
+		}
+		sendMessage(err);
+	});			
+}
+					
+</script>
+
+	</head>
+	<body>
+		<div style="display:flex;flex-direction: column;align-items:center;justify-content: center;align-content:center">
+			<div id="_message"></div>
+			<button style="background-color: #1890ff;color:#fff;padding: 0 15px;" id="intallButton" onclick="installer()">Install</button>
+		</div>
+		
+	</body>
+</html>
+
+

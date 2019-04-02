@@ -1,0 +1,207 @@
+<html>
+	<head>
+			<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+function getAPIRoot() {
+	return '';
+}
+function API(token) {
+    this.token = token;
+    this.headers = {};
+    this.headers.Authorization = ' Bearer ' + token;
+}
+
+API.prototype.createSlug = function(slug) {
+  	let reqURL = getAPIRoot() + '/slug/create/';
+	return postAPI(reqURL, slug, this.headers);
+};
+
+API.prototype.fetchSlugFile = function(slugID, url, dir) {
+    let reqURL = getAPIRoot() + '/fs/slug/' + slugID + '/fetch/file/';
+	return postAPI(reqURL, {url, dir}, this.headers, 300000);
+};
+
+API.prototype.createSlugDatabase = function(slugID) {
+    let reqURL = getAPIRoot() + '/db/create/';
+	return postAPI(reqURL, {slugID}, this.headers);
+};
+
+API.prototype.getSlugDatabase = function(slugID) {
+
+    let reqURL = getAPIRoot() + '/db/slug/' + slugID + '/';
+	return getAPI(reqURL, this.headers);
+};
+
+API.prototype.runSlugSQL = function(slugID, url) {
+    let reqURL = getAPIRoot() + '/db/run/';
+	return postAPI(reqURL, {url, slugID}, this.headers);
+};
+
+API.prototype.composeSlugTextFile = function(slugID, url, dir, model) {
+    let reqURL = getAPIRoot() + '/fs/slug/' + slugID + '/compose/file/';
+	return postAPI(reqURL, {url, dir, model}, this.headers, 200000);
+};
+
+API.prototype.startupSlug = function(slugID) {
+    let reqURL = getAPIRoot() + '/slug/startup/';
+	return postAPI(reqURL, {slugID}, this.headers);
+};
+
+
+API.prototype.shutdownSlug = function(slugID) {
+    let reqURL = getAPIRoot() + '/slug/startup/';
+	return postAPI(reqURL, {slugID}, this.headers);
+};
+
+
+
+var API_TIMEOUT = 30000;
+
+function postAPI (url, data, exheaders, timeout) {
+	return _postJSON(url, data, exheaders, timeout).then(resp => {
+		return resp.data;
+	}).catch(err => {
+		console.log('eror postJSON->url:%s %o', url, err);
+		let resp = err.response;
+		if (resp) {
+			let status = resp.status;
+			if (status === 422) {
+				if (resp.data.errors) {
+					let message = resp.data.errors[0].msg;
+					throw message; 
+				}
+			}
+		}
+		throw err;
+	});
+};
+
+function getAPI(url , exheaders, timeout){
+	return _getJSON(url, exheaders, timeout).then(resp => {
+		return resp.data;
+	}).catch(err => {
+		console.log('eror postJSON->url:%s %o', url, err);
+		let resp = err.response;
+		if (resp) {
+			let status = resp.status;
+			if (status === 422) {
+				if (resp.data.errors) {
+					let message = resp.data.errors[0].msg;
+					throw message; 
+				}
+			}
+		}
+		
+		throw err;
+	});
+}
+
+
+function _postJSON(url, data, exheaders, timeout) {
+
+	
+	let headers = {
+		'Accept': 'application/json',
+		'Content-Type': 'application/json',
+	};
+	let method = 'post';
+
+	if (exheaders) {
+		headers = Object.assign({}, headers, exheaders);
+	}
+		
+	return axios(
+		{
+			url,
+			method,
+			headers,
+			timeout,
+			data,
+		});
+
+}
+
+function _getJSON(url, exheaders, timeout) {
+
+	let headers = {
+		'Accept': 'application/json',
+		'Content-Type': 'application/json',
+	};
+	let method = 'get';
+
+	if (exheaders) {
+		headers = Object.assign({}, headers, exheaders);
+	}
+		
+	return axios(
+		{
+			url,
+			method,
+			headers,
+			timeout,
+		});
+}
+
+
+var _messages = [];
+
+function sendMessage(msg) {
+	_messages.push(msg);
+	showMessages();
+}
+
+function showMessages() {
+
+	let eleMsg = document.getElementById('_message');
+	let msgs = _messages.map(msg => '<div>' + msg + '</div>');
+	eleMsg.innerHTML = msgs.join('');
+}
+
+
+var token = '<%= token %>';
+var image = '<%= image %>';
+var id = '<%= id %>';
+var name = '<%= name %>';
+var appZip = 'https://github.com/TryGhost/Ghost/releases/download/2.9.1/Ghost-2.9.1.zip';
+//let packageFile = 'https://raw.githubusercontent.com/jaynsw/installer/master/ghost/2.9.1/package.json';
+let appConfig = 'https://raw.githubusercontent.com/jaynsw/installer/master/ghost/2.9.1/config.production.json';
+let appSQL = 'https://raw.githubusercontent.com/jaynsw/installer/master/ghost/2.9.1/ghost.sql';
+					
+					
+function installer() {
+	let slug = {id, name, image};
+						
+	let api = new API(token);
+	api.createSlug(slug).then(saveData => {
+		let slugID = id;
+		return api.fetchSlugFile(slugID, appZip, '/').then(downloadData => {
+			return api.createSlugDatabase(slugID).then(saveData => {
+				return api.runSlugSQL(slugID, appSQL).then(runData => {
+					return api.getSlugDatabase(slugID).then(dbo => {
+						let domainName = name;
+						let user = dbo.user;
+						let password = dbo.pwd;
+						let host = dbo.host;
+						let model = {domainName, user, password, database: user, host};
+						return api.composeSlugTextFile(slugID, appConfig, '/', model).then(genData => {
+							return api.startupSlug(slugID);	
+						});
+					});
+				});
+			});
+		});
+	}).catch(err => {
+		console.log(err);
+	});
+};
+					
+					
+</script>
+
+	</head>
+	<body>
+		<button onclick='installer()'>Install</button>
+	</body>
+</html>
+
+

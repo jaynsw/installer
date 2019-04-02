@@ -1,0 +1,21 @@
+
+{
+    "images": [
+        {
+            "product": "jaynsw/wordpress",
+            "name": "jaynsw/wordpress:4.9.10",
+            "installer": "https://raw.githubusercontent.com/jaynsw/installer/master/wordpress/installer.html",
+            "title": "Wordpress CMS",
+            "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Wordpress.svg/512px-Wordpress.svg.png",
+            "desc": "WordPress (WordPress.org) is a free and open-source content management system (CMS) based on PHP & MySQL.[4] Features include a plugin architecture and a template system."
+        },
+        {
+            "product": "jaynsw/ghost",
+            "name": "jaynsw/ghost:2.9.1",
+            "installer": "https://raw.githubusercontent.com/jaynsw/installer/master/ghost/installer.html",
+            "title": "ghost CMS",
+            "logo": "https://user-images.githubusercontent.com/120485/43974508-b64b2fe8-9cd2-11e8-8e58-707254b8817c.png",
+            "desc": "Ghost is a free and open source blogging platform written in JavaScript and distributed under the MIT License, designed to simplify the process of online publishing for individual bloggers as well as online publications."
+        }
+    ]
+}
