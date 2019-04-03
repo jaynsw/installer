@@ -2,7 +2,7 @@
 {
     "images": [
         {
-            "product": "jaynsw/wordpress",
+            "product": "jaynsw_wordpress",
             "name": "jaynsw/wordpress:4.9.10",
             "installer": "https://raw.githubusercontent.com/jaynsw/installer/master/wordpress/installer.html",
             "title": "Wordpress CMS",
@@ -10,7 +10,7 @@
             "desc": "WordPress (WordPress.org) is a free and open-source content management system (CMS) based on PHP & MySQL.[4] Features include a plugin architecture and a template system."
         },
         {
-            "product": "jaynsw/ghost",
+            "product": "jaynsw_ghost",
             "name": "jaynsw/ghost:2.9.1",
             "installer": "https://raw.githubusercontent.com/jaynsw/installer/master/ghost/installer.html",
             "title": "ghost CMS",
