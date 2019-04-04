@@ -28,8 +28,10 @@ API.prototype.createSlugMySQL = function(slugID) {
 
 API.prototype.getSlugMySQL = function(slugID) {
 
-    let reqURL = getAPIRoot() + '/mysql/slug/' + slugID + '/';
-	return getAPI(reqURL, this.headers);
+    let reqURL = getAPIRoot() + '/slug/' + slugID + '/metas/';
+	return getAPI(reqURL, this.headers).then(metas => {
+		return metas.filter(meta => meta.section === 'mysql');
+	});
 };
 
 API.prototype.runSlugSQL = function(slugID, url) {
@@ -177,15 +179,24 @@ function installer() {
 		return api.fetchSlugFile(slugID, appZip, '/').then(downloadData => {
 			return api.createSlugMySQL(slugID).then(saveData => {
 				return api.runSlugSQL(slugID, appSQL).then(runData => {
-					return api.getSlugMySQL(slugID).then(dbo => {
+					return api.getSlugMySQL(slugID).then(metas => {
 						let domainName = name;
-						let user = dbo.user;
-						let password = dbo.pwd;
-						let host = dbo.host;
-						let model = {domainName, user, password, database: user, host};
-						return api.composeSlugTextFile(slugID, appConfig, '/', model).then(genData => {
-							return api.startupSlug(slugID);	
-						});
+						let hostMeta = metas.find(meta => meta.metaKey === 'host');
+						let host = hostMeta ? hostMeta.metaValue : null;
+						let userMeta = metas.find(meta => meta.metaKey === 'user');
+						let user = userMeta ? userMeta.metaValue : null;
+						let passwordMeta = metas.find(meta => meta.metaKey === 'password');
+						let password = passwordMeta ? passwordMeta.metaValue : null;
+						let databaseMeta = metas.find(meta => meta.metaKey === 'database');
+						let database = databaseMeta ? databaseMeta.metaValue : null;
+						if (user && password && database && host) {
+							let model = {domainName, user, password, database: user, host};
+							return api.composeSlugTextFile(slugID, appConfig, '/', model).then(genData => {
+								return api.startupSlug(slugID);	
+							});
+						}
+						throw 'ER_DBO_NOT_FOUND';
+						
 					});
 				});
 			});
