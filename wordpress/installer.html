@@ -22,19 +22,19 @@ API.prototype.fetchSlugFile = function(slugID, url, dir) {
 	return postAPI(reqURL, {url, dir}, this.headers, 300000);
 };
 
-API.prototype.createSlugDatabase = function(slugID) {
-    let reqURL = getAPIRoot() + '/db/create/';
+API.prototype.createSlugMySQL= function(slugID) {
+    let reqURL = getAPIRoot() + '/mysql/create/';
 	return postAPI(reqURL, {slugID}, this.headers);
 };
 
-API.prototype.getSlugDatabase = function(slugID) {
+API.prototype.getSlugMySQL = function(slugID) {
 
-    let reqURL = getAPIRoot() + '/db/slug/' + slugID + '/';
+    let reqURL = getAPIRoot() + '/mysql/slug/' + slugID + '/';
 	return getAPI(reqURL, this.headers);
 };
 
 API.prototype.runSlugSQL = function(slugID, url) {
-    let reqURL = getAPIRoot() + '/db/run/';
+    let reqURL = getAPIRoot() + '/mysql/run/';
 	return postAPI(reqURL, {url, slugID}, this.headers);
 };
 
@@ -176,7 +176,7 @@ function showMessages() {
 }
 
 var token = '<%= token %>';
-var image = '<%= image %>';
+var image = '<%= image.name %>';
 var id = '<%= id %>';
 var name = '<%= name %>';
 var appZip = 'https://wordpress.org/wordpress-4.9.10.zip';
@@ -193,8 +193,8 @@ function installer() {
 		sendMessage('downloading software, this will take a little bit longer, please wait...');
 		return api.fetchSlugFile(slugID, appZip, '/').then(downloadData => {
 			sendMessage('create database...');
-			return api.createSlugDatabase(slugID).then(saveData => {
-				return api.getSlugDatabase(slugID).then(dbo => {
+			return api.createSlugMySQL(slugID).then(saveData => {
+				return api.getSlugMySQL(slugID).then(dbo => {
 					let DB_NAME = dbo.user;
 					let DB_USER = dbo.user;
 					let DB_PASSWORD = dbo.pwd;

@@ -21,19 +21,19 @@ API.prototype.fetchSlugFile = function(slugID, url, dir) {
 	return postAPI(reqURL, {url, dir}, this.headers, 300000);
 };
 
-API.prototype.createSlugDatabase = function(slugID) {
-    let reqURL = getAPIRoot() + '/db/create/';
+API.prototype.createSlugMySQL = function(slugID) {
+    let reqURL = getAPIRoot() + '/mysql/create/';
 	return postAPI(reqURL, {slugID}, this.headers);
 };
 
-API.prototype.getSlugDatabase = function(slugID) {
+API.prototype.getSlugMySQL = function(slugID) {
 
-    let reqURL = getAPIRoot() + '/db/slug/' + slugID + '/';
+    let reqURL = getAPIRoot() + '/mysql/slug/' + slugID + '/';
 	return getAPI(reqURL, this.headers);
 };
 
 API.prototype.runSlugSQL = function(slugID, url) {
-    let reqURL = getAPIRoot() + '/db/run/';
+    let reqURL = getAPIRoot() + '/mysql/run/';
 	return postAPI(reqURL, {url, slugID}, this.headers);
 };
 
@@ -175,9 +175,9 @@ function installer() {
 	api.createSlug(slug).then(saveData => {
 		let slugID = id;
 		return api.fetchSlugFile(slugID, appZip, '/').then(downloadData => {
-			return api.createSlugDatabase(slugID).then(saveData => {
+			return api.createSlugMySQL(slugID).then(saveData => {
 				return api.runSlugSQL(slugID, appSQL).then(runData => {
-					return api.getSlugDatabase(slugID).then(dbo => {
+					return api.getSlugMySQL(slugID).then(dbo => {
 						let domainName = name;
 						let user = dbo.user;
 						let password = dbo.pwd;
