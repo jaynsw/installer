@@ -27,10 +27,12 @@ API.prototype.createSlugMySQL= function(slugID) {
 	return postAPI(reqURL, {slugID}, this.headers);
 };
 
-API.prototype.getSlugMySQL = function(slugID) {
 
-    let reqURL = getAPIRoot() + '/mysql/slug/' + slugID + '/';
-	return getAPI(reqURL, this.headers);
+API.prototype.getSlugMySQL = function(slugID) {
+	let reqURL = getAPIRoot() + '/slug/' + slugID + '/metas/';
+	return getAPI(reqURL, this.headers).then(metas => {
+		return metas.filter(meta => meta.section === 'mysql');
+	});
 };
 
 API.prototype.runSlugSQL = function(slugID, url) {
@@ -194,11 +196,27 @@ function installer() {
 		return api.fetchSlugFile(slugID, appZip, '/').then(downloadData => {
 			sendMessage('create database...');
 			return api.createSlugMySQL(slugID).then(saveData => {
-				return api.getSlugMySQL(slugID).then(dbo => {
-					let DB_NAME = dbo.user;
-					let DB_USER = dbo.user;
-					let DB_PASSWORD = dbo.pwd;
-					let DB_HOST = dbo.host + ':' + dbo.port;
+				return api.getSlugMySQL(slugID).then(metas => {
+					let domainName = name;
+					let hostMeta = metas.find(meta => meta.metaKey === 'host');
+					let host = hostMeta ? hostMeta.metaValue : null;
+					let portMeta = metas.find(meta => meta.metaKey === 'port');
+					let port = portMeta ? portMeta.metaValue : null;
+					let userMeta = metas.find(meta => meta.metaKey === 'user');
+					let user = userMeta ? userMeta.metaValue : null;
+					let passwordMeta = metas.find(meta => meta.metaKey === 'password');
+					let password = passwordMeta ? passwordMeta.metaValue : null;
+					let databaseMeta = metas.find(meta => meta.metaKey === 'database');
+					let database = databaseMeta ? databaseMeta.metaValue : null;
+
+					if (!host || !port || !user || !password || !database) {
+						throw 'ER_DBO_NOT_FOUND';
+					}
+
+					let DB_NAME = user;
+					let DB_USER = user;
+					let DB_PASSWORD = password;
+					let DB_HOST = host + ':' + port;
 					let DB_CHARSET ='utf8mb4';
 					let AUTH_KEY = wp_generate_password(64, true, true);
 					let SECURE_AUTH_KEY = wp_generate_password(64, true, true);
