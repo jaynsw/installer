@@ -181,13 +181,14 @@ var token = '<%= token %>';
 var image = '<%= image.name %>';
 var id = '<%= id %>';
 var name = '<%= name %>';
+var stickySession = true;
 var appZip = 'https://wordpress.org/wordpress-4.9.10.zip';
 let appConfig = 'https://raw.githubusercontent.com/jaynsw/installer/master/wordpress/latest/wp-config.php';
 let setupPage = '/';				
 					
 function installer() {
 	document.getElementById('intallButton').style.display = 'none';
-	var slug = {id, name, image};
+	var slug = {id, name, image, stickySession};
 	sendMessage('create a server for ' + name);
 	let api = new API(token);
 	api.createSlug(slug).then(saveData => {
