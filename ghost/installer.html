@@ -164,6 +164,7 @@ var token = '<%= token %>';
 var image = '<%= image %>';
 var id = '<%= id %>';
 var name = '<%= name %>';
+var protocol = 'fastcgi';
 var appZip = 'https://github.com/TryGhost/Ghost/releases/download/2.9.1/Ghost-2.9.1.zip';
 //let packageFile = 'https://raw.githubusercontent.com/jaynsw/installer/master/ghost/2.9.1/package.json';
 let appConfig = 'https://raw.githubusercontent.com/jaynsw/installer/master/ghost/2.9.1/config.production.json';
@@ -171,7 +172,7 @@ let appSQL = 'https://raw.githubusercontent.com/jaynsw/installer/master/ghost/2.
 					
 					
 function installer() {
-	let slug = {id, name, image};
+	let slug = {id, name, image, protocol};
 						
 	let api = new API(token);
 	api.createSlug(slug).then(saveData => {
