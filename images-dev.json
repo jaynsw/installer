@@ -1,0 +1,15 @@
+
+{
+    "name": "Dev Store",
+    "images": [
+        {
+            "product": "jaynsw_node-hello",
+            "name": "jaynsw/node-hello:0.0.1",
+            "installer": "https://raw.githubusercontent.com/jaynsw/installer/master/node-hello/installer.html",
+            "title": "Node JS MySQL bootstrap",
+            "price": 3.0,
+            "logo": "https://raw.githubusercontent.com/jaynsw/installer/master/node-hello/logo.png",
+            "desc": "Node JS MySQL web application bootstrap."
+        }
+    ]
+}
