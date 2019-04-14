@@ -19,6 +19,15 @@
             "title": "ghost CMS",
             "logo": "https://user-images.githubusercontent.com/120485/43974508-b64b2fe8-9cd2-11e8-8e58-707254b8817c.png",
             "desc": "Ghost is a free and open source blogging platform written in JavaScript and distributed under the MIT License, designed to simplify the process of online publishing for individual bloggers as well as online publications."
+        },
+        {
+            "product": "jaynsw_node-hello",
+            "name": "jaynsw/node-hello:0.0.1",
+            "installer": "https://raw.githubusercontent.com/jaynsw/installer/master/node-hello/installer.html",
+            "title": "Node JS MySQL bootstrap",
+            "price": 3.0,
+            "logo": "https://raw.githubusercontent.com/jaynsw/installer/master/node-hello/logo.png",
+            "desc": "Node JS MySQL web application bootstrap."
         }
     ]
 }
