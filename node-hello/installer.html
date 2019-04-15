@@ -182,36 +182,37 @@ function installer() {
 			return api.createSlugMySQL(slugID).then(saveData => {
 				return api.runSlugSQL(slugID, appSQL).then(runData => {
 					return api.getSlugMySQL(slugID).then(metas => {
-					let domainName = name;
-					let hostMeta = metas.find(meta => meta.metaKey === 'host');
-					let host = hostMeta ? hostMeta.metaValue : null;
-					let portMeta = metas.find(meta => meta.metaKey === 'port');
-					let port = portMeta ? portMeta.metaValue : null;
-					let userMeta = metas.find(meta => meta.metaKey === 'user');
-					let user = userMeta ? userMeta.metaValue : null;
-					let passwordMeta = metas.find(meta => meta.metaKey === 'password');
-					let password = passwordMeta ? passwordMeta.metaValue : null;
-					let databaseMeta = metas.find(meta => meta.metaKey === 'database');
-					let database = databaseMeta ? databaseMeta.metaValue : null;
+						let domainName = name;
+						let hostMeta = metas.find(meta => meta.metaKey === 'host');
+						let host = hostMeta ? hostMeta.metaValue : null;
+						let portMeta = metas.find(meta => meta.metaKey === 'port');
+						let port = portMeta ? portMeta.metaValue : null;
+						let userMeta = metas.find(meta => meta.metaKey === 'user');
+						let user = userMeta ? userMeta.metaValue : null;
+						let passwordMeta = metas.find(meta => meta.metaKey === 'password');
+						let password = passwordMeta ? passwordMeta.metaValue : null;
+						let databaseMeta = metas.find(meta => meta.metaKey === 'database');
+						let database = databaseMeta ? databaseMeta.metaValue : null;
 
-					if (!host || !port || !user || !password || !database) {
-						throw 'ER_DBO_NOT_FOUND';
-					}
+						if (!host || !port || !user || !password || !database) {
+							throw 'ER_DBO_NOT_FOUND';
+						}
 
-					let DB_NAME = user;
-					let DB_USER = user;
-					let DB_PASSWORD = password;
-					let DB_HOST = host;
-					let DB_CHARSET ='utf8mb4';
+						let DB_NAME = user;
+						let DB_USER = user;
+						let DB_PASSWORD = password;
+						let DB_HOST = host;
+						let DB_CHARSET ='utf8mb4';
 					
 
-					let model = {DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_CHARSET};
-					sendMessage('config software...');
-					return api.composeSlugTextFile(slugID, appConfig, '/', model).then(genData => {
-						sendMessage('startup software...');
-						return api.startupSlug(slugID).then(startupData => {
-							sendMessage('congratulations. The installation is done. Please setup the website <a target="_blank" href="https://' + name + '/">https://' + name + '/' + '</a>' );
-							return startupData;
+						let model = {DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_CHARSET};
+						sendMessage('config software...');
+						return api.composeSlugTextFile(slugID, appConfig, '/', model).then(genData => {
+							sendMessage('startup software...');
+							return api.startupSlug(slugID).then(startupData => {
+								sendMessage('congratulations. The installation is done. Please setup the website <a target="_blank" href="https://' + name + '/">https://' + name + '/' + '</a>' );
+								return startupData;
+							});
 						});	
 					});
 				});
