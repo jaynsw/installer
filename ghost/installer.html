@@ -52,7 +52,14 @@ function installer() {
 						if (user && password && database && host) {
 							let model = {domainName, user, password, database: user, host};
 							return api.composeSlugTextFile(slugID, appConfig, '/', model).then(genData => {
-								return api.startupSlug(slugID);	
+								return api.startupSlug(slugID).then(startupData => {
+									return new Promise((resolve, reject) => {
+										setTimeout(() => {
+											sendMessage('congratulations. The installation is done. Please setup the website <a target="_blank" href="https://' + name + '/">https://' + name + '/' + '</a>' );
+											resolve(startupData);
+										} , 10000);
+									});
+								});	
 							});
 						}
 						throw 'ER_DBO_NOT_FOUND';

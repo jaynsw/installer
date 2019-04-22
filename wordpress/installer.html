@@ -94,8 +94,12 @@ function installer() {
 					return api.composeSlugTextFile(slugID, appConfig, '/', model).then(genData => {
 						sendMessage('startup software...');
 						return api.startupSlug(slugID).then(startupData => {
-							sendMessage('congratulations. The installation is done. Please setup the website <a target="_blank" href="https://' + name + '/">https://' + name + '/' + '</a>' );
-							return startupData;
+							return new Promise((resolve, reject) => {
+								setTimeout(() => {
+									sendMessage('congratulations. The installation is done. Please setup the website <a target="_blank" href="https://' + name + '/">https://' + name + '/' + '</a>' );
+									resolve(startupData);
+								} , 10000);
+							});
 						});	
 					});
 				});
