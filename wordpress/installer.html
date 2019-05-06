@@ -5,7 +5,7 @@
 			<script>
 
 
-function wp_generate_password(length = 12, special_chars = true, extra_special_chars = false ) {
+function wp_generate_password(length = 12, special_chars = false, extra_special_chars = false ) {
 	let chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 	if (special_chars) {
 		chars += '!@#$%^&*()';
@@ -120,7 +120,7 @@ function installer() {
 	<body>
 		<div style="display:flex;flex-direction: column;align-items:center;justify-content: center;align-content:center">
 			<div id="_message"></div>
-			<button style="background-color: #1890ff;color:#fff;padding: 0 15px;" id="intallButton" onclick="installer()">Install</button>
+			<button style="padding: 10px;background-color: #1890ff;color:#fff;padding: 0 15px;" id="intallButton" onclick="installer()">Install</button>
 		</div>
 		
 	</body>
