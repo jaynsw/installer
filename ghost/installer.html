@@ -17,13 +17,12 @@ function showMessages() {
 	eleMsg.innerHTML = msgs.join('');
 }
 
-
 var token = '<%= token %>';
-var image = '<%= image %>';
+var image = '<%= image.name %>';
 var id = '<%= id %>';
 var name = '<%= name %>';
-var price = 3.0;
-var protocol = 'fastcgi';
+
+var protocol = 'http';
 var appZip = 'https://github.com/TryGhost/Ghost/releases/download/2.9.1/Ghost-2.9.1.zip';
 let appConfig = 'https://raw.githubusercontent.com/jaynsw/installer/master/ghost/config.production.json';
 let appSQL = 'https://raw.githubusercontent.com/jaynsw/installer/master/ghost/database.sql';
