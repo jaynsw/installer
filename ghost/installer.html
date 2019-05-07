@@ -29,12 +29,15 @@ let appSQL = 'https://raw.githubusercontent.com/jaynsw/installer/master/ghost/da
 					
 					
 function installer() {
+	document.getElementById('intallButton').style.display = 'none';
 	let slug = {id, name, image, protocol};
-						
+	sendMessage('create a server for ' + name);			
 	let api = new API(token);
 	api.createSlug(slug).then(saveData => {
 		let slugID = id;
+		sendMessage('downloading software, this will take a little bit longer, please wait...');
 		return api.fetchSlugFile(slugID, appZip, '/').then(downloadData => {
+			sendMessage('create database...');
 			return api.createSlugMySQL(slugID).then(saveData => {
 				return api.runSlugSQL(slugID, appSQL).then(runData => {
 					return api.getSlugMySQL(slugID).then(metas => {
@@ -49,7 +52,9 @@ function installer() {
 						let database = databaseMeta ? databaseMeta.metaValue : null;
 						if (user && password && database && host) {
 							let model = {domainName, user, password, database: user, host};
+							sendMessage('config software...');
 							return api.composeSlugTextFile(slugID, appConfig, '/', model).then(genData => {
+								sendMessage('startup software...');
 								return api.startupSlug(slugID).then(startupData => {
 									return new Promise((resolve, reject) => {
 										setTimeout(() => {
