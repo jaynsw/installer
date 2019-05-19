@@ -7,7 +7,7 @@
             "name": "jaynsw/wordpress:4.9.10",
             "installer": "https://raw.githubusercontent.com/jaynsw/installer/master/wordpress/installer.html",
             "title": "Wordpress CMS",
-            "price": 3.0,
+            "price": 30,
             "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Wordpress.svg/512px-Wordpress.svg.png",
             "desc": "WordPress (WordPress.org) is a free and open-source content management system (CMS) based on PHP & MySQL.[4] Features include a plugin architecture and a template system."
         }
